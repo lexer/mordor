@@ -1,60 +1,59 @@
 package com.lyft.mordor.screens;
 
-import android.os.Bundle;
-import android.util.Log;
-
-import com.lyft.mordor.MainActivity;
+import com.lyft.mordor.AppModule;
+import com.lyft.mordor.android.ActionBarModule;
+import com.lyft.mordor.android.ActionBarOwner;
+import com.lyft.mordor.core.MainScope;
+import com.lyft.mordor.utils.FlowOwner;
 import com.lyft.mordor.views.MainView;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import dagger.Provides;
+import flow.Flow;
+import flow.HasParent;
+import flow.Parcer;
 import mortar.Blueprint;
-import mortar.ViewPresenter;
+import rx.util.functions.Action0;
 
 /**
- * Created by zakharov on 3/23/14.
+ * Created by zakharov on 4/6/14.
  */
 public class Main implements Blueprint {
-    @Override
-    public String getMortarScopeName() {
+
+    @Override public String getMortarScopeName() {
         return getClass().getName();
     }
 
-    @Override
-    public Object getDaggerModule() {
+    @Override public Object getDaggerModule() {
         return new Module();
     }
 
-    @dagger.Module(injects = {MainActivity.class, MainView.class})
-    class Module {
+    @dagger.Module( //
+            includes = ActionBarModule.class,
+            injects = MainView.class,
+            addsTo = AppModule.class, //
+            library = true //
+    )
+    public static class Module {
+        @Provides
+        @MainScope
+        Flow provideFlow(Presenter presenter) {
+            return presenter.getFlow();
+        }
     }
 
     @Singleton
-    public static class Presenter extends ViewPresenter<MainView> {
-
-        private static final String TAG = "Main.Presenter";
+    public static class Presenter extends FlowOwner<Blueprint, MainView> {
 
         @Inject
-        Presenter() {
-            Log.d(TAG, "presenter created");
+        Presenter(Parcer<Object> flowParcer) {
+            super(flowParcer);
         }
 
-        @Override
-        protected void onLoad(Bundle savedInstanceState) {
-            super.onLoad(savedInstanceState);
-
-            Log.d(TAG, "presenter onLoad");
-            getView().show("hello");
-
-        }
-
-        @Override
-        protected void onSave(Bundle outState) {
-
-            Log.d(TAG, "presenter onSave");
-            super.onSave(outState);
-
+        @Override protected Blueprint getFirstScreen() {
+            return new LoginScreen();
         }
     }
 }
