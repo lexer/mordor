@@ -18,14 +18,13 @@ package com.lyft.mordor.android;
 import android.content.Context;
 import android.os.Bundle;
 import mortar.Mortar;
-import mortar.MortarContext;
 import mortar.MortarScope;
 import mortar.Presenter;
 import rx.util.functions.Action0;
 
 /** Allows shared configuration of the Android ActionBar. */
 public class ActionBarOwner extends Presenter<ActionBarOwner.View> {
-    public interface View extends MortarContext {
+    public interface View  {
         void setShowHomeEnabled(boolean enabled);
 
         void setUpButtonEnabled(boolean enabled);
@@ -33,6 +32,8 @@ public class ActionBarOwner extends Presenter<ActionBarOwner.View> {
         void setTitle(CharSequence title);
 
         void setMenu(MenuAction action);
+
+        Context getMortarContext();
     }
 
     public static class Config {
@@ -84,7 +85,7 @@ public class ActionBarOwner extends Presenter<ActionBarOwner.View> {
     }
 
     @Override protected MortarScope extractScope(View view) {
-        return view.getMortarScope();
+        return Mortar.getScope(view.getMortarContext());
     }
 
     private void update() {

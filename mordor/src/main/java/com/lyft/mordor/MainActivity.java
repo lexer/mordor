@@ -1,5 +1,6 @@
 package com.lyft.mordor;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -16,7 +17,6 @@ import javax.inject.Inject;
 import flow.Flow;
 import mortar.Mortar;
 import mortar.MortarActivityScope;
-import mortar.MortarContext;
 import mortar.MortarScope;
 
 import static android.content.Intent.ACTION_MAIN;
@@ -26,7 +26,7 @@ import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 /**
  * Created by zakharov on 3/23/14.
  */
-public class MainActivity extends ActionBarActivity implements MortarContext, ActionBarOwner.View {
+public class MainActivity extends ActionBarActivity implements ActionBarOwner.View {
     private MortarActivityScope activityScope;
     private ActionBarOwner.MenuAction actionBarMenuAction;
 
@@ -41,7 +41,7 @@ public class MainActivity extends ActionBarActivity implements MortarContext, Ac
             return;
         }
 
-        MortarScope parentScope = ((App) getApplication()).getRootScope();
+        MortarScope parentScope = Mortar.getScope(getApplication());
         activityScope = Mortar.requireActivityScope(parentScope, new Main());
         Mortar.inject(this, this);
 
@@ -51,6 +51,13 @@ public class MainActivity extends ActionBarActivity implements MortarContext, Ac
         mainFlow = mainView.getFlow();
 
         actionBarOwner.takeView(this);
+    }
+
+    @Override public Object getSystemService(String name) {
+           if (Mortar.isScopeSystemService(name)) {
+                  return activityScope;
+                }
+            return super.getSystemService(name);
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) {
@@ -100,10 +107,6 @@ public class MainActivity extends ActionBarActivity implements MortarContext, Ac
         }
     }
 
-    @Override public MortarScope getMortarScope() {
-        return activityScope;
-    }
-
     @Override public void setShowHomeEnabled(boolean enabled) {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
@@ -120,6 +123,11 @@ public class MainActivity extends ActionBarActivity implements MortarContext, Ac
             actionBarMenuAction = action;
             invalidateOptionsMenu();
         }
+    }
+
+    @Override
+    public Context getMortarContext() {
+        return this;
     }
 
     /**

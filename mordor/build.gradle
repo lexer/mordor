@@ -30,7 +30,7 @@ dependencies {
 
     compile 'com.squareup.dagger:dagger:1.2.1'
     compile 'com.squareup.dagger:dagger-compiler:1.2.1'
-    compile 'com.squareup.mortar:mortar:0.11'
+    compile 'com.squareup.mortar:mortar:0.12'
     compile 'com.squareup.flow:flow:0.4'
 
     compile 'com.jakewharton:butterknife:4.0.1'

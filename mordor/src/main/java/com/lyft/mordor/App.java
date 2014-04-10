@@ -14,14 +14,19 @@ import rx.plugins.RxJavaPlugins;
 public class App extends Application {
     private MortarScope rootScope;
 
-    @Override public void onCreate() {
+    @Override
+    public void onCreate() {
         super.onCreate();
 
         rootScope =
                 Mortar.createRootScope(BuildConfig.DEBUG, ObjectGraph.create(new AppModule()));
     }
 
-    public MortarScope getRootScope() {
-        return rootScope;
+    @Override
+    public Object getSystemService(String name) {
+        if (Mortar.isScopeSystemService(name)) {
+            return rootScope;
+        }
+        return super.getSystemService(name);
     }
 }
